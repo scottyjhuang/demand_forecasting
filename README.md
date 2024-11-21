@@ -1,1 +1,1 @@
-# inventory_optimisation
+# Managing Demand Surge During a Viral Campaign
