@@ -55,7 +55,7 @@ df['Date'] = pd.to_datetime(df['Date'],format='%Y/%m/%d')
 # we have the demand from 2023-06 to 2023-08 (2 months)
 
 ```
-![Data Cleaning](assets/images/data_cleaning.png)
+![Data Cleaning](assets/images/1.png)
 
 2. Data Cleaning
 Only keep the column date and demand to fit in the forecast model
@@ -64,7 +64,7 @@ df_demand = df[['Date','Demand']]
 df_demand = df_demand.set_index('Date')
 df_demand.info()
 ```
-![Data Cleaning](assets/images/data_cleaning.png)
+![Data Cleaning](assets/images/2.png)
 
 3. Data Visualisation
 Visualise the data and see if we can identify a pattern
@@ -100,7 +100,7 @@ def test_stationarity(timeseries):
 test_stationarity(df_demand)
 ```
 The original timeseries is stationary.
-![Data Cleaning](assets/images/data_cleaning.png)
+![Data Cleaning](assets/images/3.png)
 
 5. ARIMA model
   - determine p & q value
@@ -116,4 +116,22 @@ The original timeseries is stationary.
     plot_pacf(differenced_series,ax=axes[1])
     plt.show()
     ```
+    ![Data Cleaning](assets/images/4.png)
     p and q are in the blue area. Let's go back the testing and see if we can use differenced df_demand
+    ```python
+    test_stationarity(df_demand.diff().dropna())
+    ```
+    ![Data Cleaning](assets/images/5.png)
+    The first-order differenced (lagged) demand is stationary as well
+
+    ```python
+    differenced_series = df_demand.diff().dropna()
+    
+    fig,axes = plt.subplots(1,2,figsize=(12,4))
+    plot_acf(differenced_series,ax=axes[0])
+    plot_pacf(differenced_series,ax=axes[1])
+    plt.show()
+    
+    ```
+    ![Data Cleaning](assets/images/6.png)
+    Now we get **q = 1** (PACF plot), **d =1** (as we differenced the Time Series), and **q = 1** (ACF plot)
