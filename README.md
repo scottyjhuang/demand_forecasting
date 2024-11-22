@@ -56,49 +56,49 @@ Let's start with importing some modules for visualisation and time series foreca
   ![figure 1.](assets/image/1.png)
 
 2. Data Cleaning
-   Only keep the column date and demand to fit in the forecast model
-  ```python
-  df_demand = df[['Date','Demand']]
-  df_demand = df_demand.set_index('Date')
-  df_demand.info()
-  ```
-![figure 2.](assets/image/2.png)
+     Only keep the column date and demand to fit in the forecast model
+     ```python
+     df_demand = df[['Date','Demand']]
+     df_demand = df_demand.set_index('Date')
+     df_demand.info()
+     ```
+    ![figure 2.](assets/image/2.png)
 
 3. Data Visualisation
-   Visualise the data and see if we can identify a pattern
-  ```python
-  plt.figure(figsize=(20,5))
-  plt.plot(df_demand)
-  ```
+    Visualise the data and see if we can identify a pattern
+    ```python
+    plt.figure(figsize=(20,5))
+    plt.plot(df_demand)
+    ```
 ![figure 3.](assets/image/3.png)
 4. Data Validation
-5. Check if the data is suitable for an ARIMA model by determining whether it is stationary or not.
-
-```python
-# import the ADF (Augmented Dickey-Fuller) test
-# H0: The Time Series is non-stationary
-# H1: The Time Series is stationary (which ARIMA models work best with)
-# If p value < 0.05 then reject H0
-
-from statsmodels.tsa.stattools import adfuller
-
-# create a function that returns the necessary metrics to test stationarity
-def test_stationarity(timeseries):
-    dftest_initial = adfuller(timeseries)
-    dfoutput_initial = pd.Series(dftest_initial[0:4], 
-          index=['Statistical Test', 
-                 'p-value', 
-                 '#Lags used', 
-                 'Number of observations'
-                 ])
-    for key, value in dftest_initial[4].items():
-        dfoutput_initial['Critical value ' + key] = value
-    print(dfoutput_initial)
-    print('\n')
-test_stationarity(df_demand)
-```
-The original timeseries is stationary.
-![figure 4.](assets/image/4.png)
+    Check if the data is suitable for an ARIMA model by determining whether it is stationary or not.
+    
+    ```python
+    # import the ADF (Augmented Dickey-Fuller) test
+    # H0: The Time Series is non-stationary
+    # H1: The Time Series is stationary (which ARIMA models work best with)
+    # If p value < 0.05 then reject H0
+    
+    from statsmodels.tsa.stattools import adfuller
+    
+    # create a function that returns the necessary metrics to test stationarity
+    def test_stationarity(timeseries):
+        dftest_initial = adfuller(timeseries)
+        dfoutput_initial = pd.Series(dftest_initial[0:4], 
+              index=['Statistical Test', 
+                     'p-value', 
+                     '#Lags used', 
+                     'Number of observations'
+                     ])
+        for key, value in dftest_initial[4].items():
+            dfoutput_initial['Critical value ' + key] = value
+        print(dfoutput_initial)
+        print('\n')
+    test_stationarity(df_demand)
+    ```
+    The original timeseries is stationary.
+    ![figure 4.](assets/image/4.png)
 
 5. ARIMA model
   - determine p & q value
