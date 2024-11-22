@@ -106,7 +106,7 @@ Let's start with importing some modules for visualisation and time series foreca
 
 6. ARIMA model
    
-  - determine p & q value
+- determine p & q value
     p = last lag where the PACF value is out of the significance band
     q = last lag where the ACF value is out of the significance band (displayed by the confidence interval)
     ```python
@@ -140,3 +140,185 @@ Let's start with importing some modules for visualisation and time series foreca
     Now we get **q = 1** (PACF plot), **d =1** (as we differenced the Time Series), and **q = 1** (ACF plot)
     ![figure 7.](assets/image/7.png)
 
+- training
+
+  ```python
+  testing_timeframe = 5
+  train1 = df_demand.iloc[:-int(len(df_demand)*0.2)]
+  test1  = df_demand.iloc[-int(len(df_demand)*0.2):]
+  print('training set (past data): ', len(train1))
+  print('test set (days to be forecasted ahead): ', len(test1))
+  ```
+  ![figure 8.](assets/image/8.png)
+
+- ARIMA result
+
+  ```python
+  # import the required modules
+  from statsmodels.tsa.arima.model import ARIMA
+  from statsmodels.tsa.statespace.sarimax import SARIMAX
+  from sklearn.metrics import mean_squared_error
+  
+  # create and fit the model
+  model_fit = ARIMA(train1,  
+                    order = (2,1,1)
+                  ).fit()
+  print(model_fit.summary())
+  print('\n')
+  #####################################################################################
+  
+  # create forecasts on training set (to evaluate how the model behaves to known-training data)
+  forecasts_on_train = model_fit.predict()
+  # create forecasts on test set (to evaluate how the model behaves to unknown-test data)
+  forecasts_on_test  = model_fit.forecast(len(test1))
+  # calculate the root mean squared error on the test set
+  RMSE = np.sqrt(mean_squared_error(test1['Demand'], forecasts_on_test))
+  # print the AIC and RMSE 
+  print('AIC: ' , model_fit.aic)
+  print('RMSE: ', RMSE)
+  
+  #####################################################################################
+  
+  # plot the train and test daat against their corresponding forecasts
+  # on train data
+  plt.figure(figsize=(16,4))
+  plt.plot(train1['Demand'], label="Actual")
+  plt.plot(forecasts_on_train, label="Predicted")
+  plt.legend()
+  # on test data
+  plt.figure(figsize=(16,4))
+  plt.plot(test1['Demand'], label="Actual")
+  plt.plot(forecasts_on_test, label="Predicted")
+  plt.legend()
+  ```
+  when order = (2,1,1), we get the optimised RMSE
+  The second graph shows that we need to add seaonality.
+  
+  ![figure 9.](assets/image/9.png)
+
+  ![figure 9.1](assets/image/9.1.png)
+
+  ```python
+  # import the required modules
+  from statsmodels.tsa.arima.model import ARIMA
+  from statsmodels.tsa.statespace.sarimax import SARIMAX
+  from sklearn.metrics import mean_squared_error
+  
+  # D=1 if the series has a stable seasonal pattern over time
+  # S = ACG lag with the highest value (typically at a high lag), often it is 4 for quarterly data or 12 for monthly data. In this case, S=2
+  # P>=1 if the ACF is greater than 0 at S=2, else P= 0
+  # Q>=1 if the ACF is less than 0 at S=2, else Q= 0
+  # therfore P = 0 and Q = 2
+  
+  # create and fit the model
+  model_fit = SARIMAX(train1,order=(2,1,1),seasonal_order=(0,1,2,2)).fit()
+  print(model_fit.summary())
+  print('\n')
+  #####################################################################################
+  
+  # create forecasts on training set (to evaluate how the model behaves to known-training data)
+  forecasts_on_train = model_fit.predict()
+  # create forecasts on test set (to evaluate how the model behaves to unknown-test data)
+  forecasts_on_test  = model_fit.forecast(len(test1))
+  # calculate the root mean squared error on the test set
+  RMSE = np.sqrt(mean_squared_error(test1['Demand'], forecasts_on_test))
+  # print the AIC and RMSE 
+  print('AIC: ' , model_fit.aic)
+  print('RMSE: ', RMSE)
+  
+  #####################################################################################
+  
+  # plot the train and test daat against their corresponding forecasts
+  # on train data
+  plt.figure(figsize=(16,4))
+  plt.plot(train1['Demand'], label="Actual")
+  plt.plot(forecasts_on_train, label="Predicted")
+  plt.legend()
+  # on test data
+  plt.figure(figsize=(16,4))
+  plt.plot(test1['Demand'], label="Actual")
+  plt.plot(forecasts_on_test, label="Predicted")
+  plt.legend()
+  ```
+
+  ![figure 10.](assets/image/10.png)
+
+  ![figure 10.1.](assets/image/10.1.png)
+
+  ```python
+  # Create the diagnostics plot to do the final validation.
+  model_fit.plot_diagnostics(figsize=(14,7))
+  plt.show()
+  ```
+
+  1. Standardized residual: There are no patterns in the residuals.
+  2. Histogram plus kde estimate: The KDE curve should be very similar to the normal distribution.
+  3. Normal Q-Q: Most of the data points should lie on the straight line,
+  4. Correlogram: 95% of correlations for lag greater than one should not be significant.  
+
+  ![figure 11.](assets/image/11.png)
+
+  ```python
+  # forecast for the next 10 days
+  order = (2, 1, 1)
+  seasonal_order = (0, 1, 1, 2) #2 because the data contains a time period of 2 months only
+  model = SARIMAX(df_demand, order=order, seasonal_order=seasonal_order)
+  model_fit = model.fit(disp=False)
+  
+  future_steps = 10
+  predictions = model_fit.predict(len(df_demand), len(df_demand) + future_steps - 1)
+  predictions = predictions.astype(int)
+  print(predictions)
+  ```
+  
+  ![figure 12.](assets/image/12.png)
+
+  ```python
+  import math
+
+  # Create date indices for the future predictions
+  future_dates = pd.date_range(start=df_demand.index[-1] + pd.DateOffset(days=1), periods=future_steps, freq='D')
+  
+  # Create a pandas Series with the predicted values and date indices
+  forecasted_demand = pd.Series(predictions, index=future_dates)
+  
+  # Initial inventory level
+  initial_inventory = 1000
+  
+  # Lead time (number of days it takes to replenish inventory) 
+  lead_time = 100 # production + shipping from APAC to EMEA
+  
+  # Service level (probability of not stocking out)
+  service_level = 0.95
+  
+  # Calculate the optimal order quantity using the Newsvendor formula
+  z = np.abs(np.percentile(forecasted_demand, 100 * (1 - service_level)))
+  order_quantity = np.ceil(forecasted_demand.mean() + z).astype(int)
+  
+  # Calculate the reorder point
+  reorder_point = forecasted_demand.mean() * lead_time + z
+  
+  # Calculate the optimal safety stock
+  safety_stock = reorder_point - forecasted_demand.mean() * lead_time
+  
+  # Calculate the total cost (holding cost + stockout cost)
+  holding_cost = 0.1  # it's different for every business, 0.1 is an example
+  stockout_cost = 10  # # it's different for every business, 10 is an example
+  total_holding_cost = holding_cost * (initial_inventory + 0.5 * order_quantity)
+  total_stockout_cost = stockout_cost * np.maximum(0, forecasted_demand.mean() * lead_time - initial_inventory)
+  
+  # Calculate the total cost
+  total_cost = total_holding_cost + total_stockout_cost
+  
+  # Calculate EOQ = [(2*S*D)/H]^(1/2)
+  EOQ = math.sqrt((2*stockout_cost*forecasted_demand.mean())/holding_cost)
+  
+  
+  print("Optimal Order Quantity:", order_quantity)
+  print("Reorder Point:", reorder_point)
+  print("Safety Stock:", safety_stock)
+  print("Total Cost:", total_cost)
+  print("EOQ:",EOQ)
+  ```
+
+  ![figure 13.](assets/image/13.png)
