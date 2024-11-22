@@ -45,14 +45,13 @@ Let's start with importing some modules for visualisation and time series foreca
   from statsmodels.tsa.statespace.sarimax import SARIMAX
   from statsmodels.tsa.arima.model import ARIMA
   from sklearn.metrics import mean_squared_error
-  
   # Exporing the data
   df = pd.read_csv("demand_inventory.csv")
   df.info()
   df['Date'] = pd.to_datetime(df['Date'],format='%Y/%m/%d')
   # we have the demand from 2023-06 to 2023-08 (2 months)
-  
   ```
+
   ![figure 1.](assets/image/1.png)
 
 2. Data Cleaning
@@ -106,7 +105,7 @@ The original timeseries is stationary.
    
   - determine p & q value
     p = last lag where the PACF value is out of the significance band
-    q = last lag where the ACF value is out of the significance band (displayed by the confidence interval
+    q = last lag where the ACF value is out of the significance band (displayed by the confidence interval)
     ```python
     # ref: https://www.linkedin.com/pulse/time-series-episode-1-how-select-correct-sarima-vasilis-kalyvas-jqcjf/
     
