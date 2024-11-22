@@ -33,45 +33,46 @@ I separate the analysis into 2 part: demand forecasting and inventory optimisati
 Let's start with importing some modules for visualisation and time series forecast
 
 1. Data Exploring
-  ```python
-  import pandas as pd # Pandas is a Python library used for working with data sets. It has functions for analyzing, cleaning, exploring, and manipulating data.
-  import numpy as np # NumPy arrays facilitate advanced mathematical and other types of operations on large numbers of data
-  import plotly.express as px # Plotly express is a high-level data visualization package that allows you to create interactive plots with very little code
-  from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
-  # plot_acf: Plots lags on the horizontal axis and correlations on the vertical axis 
-  # plot_pacf: Plots lags on the horizontal axis and correlations on the vertical axis. It also allows you to specify the calculation method, such as Yule Walker, Levinson-Durbin recursion, or regression of time series on lags
-  import matplotlib.pyplot as plt # Matplotlib allows you to generate plots, histograms, bar charts, scatter plots, etc
-  from statsmodels.tsa.stattools import adfuller
-  from statsmodels.tsa.statespace.sarimax import SARIMAX
-  from statsmodels.tsa.arima.model import ARIMA
-  from sklearn.metrics import mean_squared_error
-  # Exporing the data
-  df = pd.read_csv("demand_inventory.csv")
-  df.info()
-  df['Date'] = pd.to_datetime(df['Date'],format='%Y/%m/%d')
-  # we have the demand from 2023-06 to 2023-08 (2 months)
-  ```
-
-  ![figure 1.](assets/image/1.png)
+   
+   ```python
+   import pandas as pd # Pandas is a Python library used for working with data sets. It has functions for analyzing, cleaning, exploring, and manipulating data.
+   import numpy as np # NumPy arrays facilitate advanced mathematical and other types of operations on large numbers of data
+   import plotly.express as px # Plotly express is a high-level data visualization package that allows you to create interactive plots with very little code
+   from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+   # plot_acf: Plots lags on the horizontal axis and correlations on the vertical axis 
+   # plot_pacf: Plots lags on the horizontal axis and correlations on the vertical axis. It also allows you to specify the calculation method, such as Yule Walker, Levinson-Durbin recursion, or regression of time series on lags
+   import matplotlib.pyplot as plt # Matplotlib allows you to generate plots, histograms, bar charts, scatter plots, etc
+   from statsmodels.tsa.stattools import adfuller
+   from statsmodels.tsa.statespace.sarimax import SARIMAX
+   from statsmodels.tsa.arima.model import ARIMA
+   from sklearn.metrics import mean_squared_error
+   # Exporing the data
+   df = pd.read_csv("demand_inventory.csv")
+   df.info()
+   df['Date'] = pd.to_datetime(df['Date'],format='%Y/%m/%d')
+   # we have the demand from 2023-06 to 2023-08 (2 months)
+   ```
+  
+    ![figure 1.](assets/image/1.png)
 
 2. Data Cleaning
 
-     Only keep the column date and demand to fit in the forecast model
-     ```python
-     df_demand = df[['Date','Demand']]
-     df_demand = df_demand.set_index('Date')
-     df_demand.info()
-     ```
-    ![figure 2.](assets/image/2.png)
+   Only keep the column date and demand to fit in the forecast model
+   ```python
+   df_demand = df[['Date','Demand']]
+   df_demand = df_demand.set_index('Date')
+   df_demand.info()
+   ```
+   ![figure 2.](assets/image/2.png)
 
 4. Data Visualisation
 
-    Visualise the data and see if we can identify a pattern
-    ```python
-    plt.figure(figsize=(20,5))
-    plt.plot(df_demand)
-    ```
-![figure 3.](assets/image/3.png)
+   Visualise the data and see if we can identify a pattern
+   ```python
+   plt.figure(figsize=(20,5))
+   plt.plot(df_demand)
+   ```
+   ![figure 3.](assets/image/3.png)
 
 5. Data Validation
 
