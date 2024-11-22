@@ -72,7 +72,7 @@ Let's start with importing some modules for visualisation and time series foreca
     plt.plot(df_demand)
     ```
 ![figure 3.](assets/image/3.png)
-4. Data Validation
+5. Data Validation
 
 Check if the data is suitable for an ARIMA model by determining whether it is stationary or not.
 ```python
@@ -101,7 +101,7 @@ test_stationarity(df_demand)
 The original timeseries is stationary.
 ![figure 4.](assets/image/4.png)
 
-5. ARIMA model
+6. ARIMA model
    
   - determine p & q value
     p = last lag where the PACF value is out of the significance band
