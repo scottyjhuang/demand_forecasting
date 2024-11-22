@@ -56,6 +56,7 @@ Let's start with importing some modules for visualisation and time series foreca
   ![figure 1.](assets/image/1.png)
 
 2. Data Cleaning
+
      Only keep the column date and demand to fit in the forecast model
      ```python
      df_demand = df[['Date','Demand']]
@@ -64,7 +65,8 @@ Let's start with importing some modules for visualisation and time series foreca
      ```
     ![figure 2.](assets/image/2.png)
 
-3. Data Visualisation
+4. Data Visualisation
+
     Visualise the data and see if we can identify a pattern
     ```python
     plt.figure(figsize=(20,5))
@@ -72,9 +74,9 @@ Let's start with importing some modules for visualisation and time series foreca
     ```
 ![figure 3.](assets/image/3.png)
 4. Data Validation
+
     Check if the data is suitable for an ARIMA model by determining whether it is stationary or not.
-    
-    ```python
+    ```
     # import the ADF (Augmented Dickey-Fuller) test
     # H0: The Time Series is non-stationary
     # H1: The Time Series is stationary (which ARIMA models work best with)
@@ -101,6 +103,7 @@ Let's start with importing some modules for visualisation and time series foreca
     ![figure 4.](assets/image/4.png)
 
 5. ARIMA model
+   
   - determine p & q value
     p = last lag where the PACF value is out of the significance band
     q = last lag where the ACF value is out of the significance band (displayed by the confidence interval
