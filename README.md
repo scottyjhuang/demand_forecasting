@@ -72,6 +72,7 @@ Let's start with importing some modules for visualisation and time series foreca
     plt.plot(df_demand)
     ```
 ![figure 3.](assets/image/3.png)
+
 5. Data Validation
 
 Check if the data is suitable for an ARIMA model by determining whether it is stationary or not.
