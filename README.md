@@ -261,7 +261,7 @@ Let's start with importing some modules for visualisation and time series foreca
   ```python
   # forecast for the next 10 days
   order = (2, 1, 1)
-  seasonal_order = (0, 1, 1, 2) #2 because the data contains a time period of 2 months only
+  seasonal_order = (0, 1, 1, 2) # the data contains a time period of 2 months only
   model = SARIMAX(df_demand, order=order, seasonal_order=seasonal_order)
   model_fit = model.fit(disp=False)
   
@@ -281,38 +281,29 @@ Let's start with importing some modules for visualisation and time series foreca
   
   # Create a pandas Series with the predicted values and date indices
   forecasted_demand = pd.Series(predictions, index=future_dates)
-  
-  # Initial inventory level
+
+  # ParametersInitial
   initial_inventory = 1000
-  
-  # Lead time (number of days it takes to replenish inventory) 
   lead_time = 100 # production + shipping from APAC to EMEA
-  
-  # Service level (probability of not stocking out)
   service_level = 0.95
   
-  # Calculate the optimal order quantity using the Newsvendor formula
-  z = np.abs(np.percentile(forecasted_demand, 100 * (1 - service_level)))
-  order_quantity = np.ceil(forecasted_demand.mean() + z).astype(int)
+  # Calculate EOQ = [(2*S*D)/H]^(1/2)
+  EOQ = math.sqrt((2*stockout_cost*forecasted_demand.mean())/holding_cost)
+
+  # Calculate the optimal safety stock
+  safety_stock = z = np.abs(np.percentile(forecasted_demand, 100 * (1 - service_level)))
   
   # Calculate the reorder point
-  reorder_point = forecasted_demand.mean() * lead_time + z
-  
-  # Calculate the optimal safety stock
-  safety_stock = reorder_point - forecasted_demand.mean() * lead_time
+  reorder_point = forecasted_demand.mean() * lead_time + EOQ
   
   # Calculate the total cost (holding cost + stockout cost)
-  holding_cost = 0.1  # it's different for every business, 0.1 is an example
-  stockout_cost = 10  # # it's different for every business, 10 is an example
+  holding_cost = USD 0.15
+  stockout_cost = USD 10 (missed sales)
   total_holding_cost = holding_cost * (initial_inventory + 0.5 * order_quantity)
   total_stockout_cost = stockout_cost * np.maximum(0, forecasted_demand.mean() * lead_time - initial_inventory)
   
   # Calculate the total cost
   total_cost = total_holding_cost + total_stockout_cost
-  
-  # Calculate EOQ = [(2*S*D)/H]^(1/2)
-  EOQ = math.sqrt((2*stockout_cost*forecasted_demand.mean())/holding_cost)
-  
   
   print("Optimal Order Quantity:", order_quantity)
   print("Reorder Point:", reorder_point)
