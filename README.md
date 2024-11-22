@@ -53,7 +53,7 @@ Let's start with importing some modules for visualisation and time series foreca
   # we have the demand from 2023-06 to 2023-08 (2 months)
   
   ```
-![figure 1.](assets/image/1.png)
+  ![figure 1.](assets/image/1.png)
 
 2. Data Cleaning
    Only keep the column date and demand to fit in the forecast model
