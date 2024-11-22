@@ -75,32 +75,32 @@ Let's start with importing some modules for visualisation and time series foreca
 
 5. Data Validation
 
-Check if the data is suitable for an ARIMA model by determining whether it is stationary or not.
-```python
-# import the ADF (Augmented Dickey-Fuller) test
-# H0: The Time Series is non-stationary
-# H1: The Time Series is stationary (which ARIMA models work best with)
-# If p value < 0.05 then reject H0
-    
-from statsmodels.tsa.stattools import adfuller
-
-# create a function that returns the necessary metrics to test stationarity
-def test_stationarity(timeseries):
-dftest_initial = adfuller(timeseries)
-dfoutput_initial = pd.Series(dftest_initial[0:4], 
-index=['Statistical Test', 
-                     'p-value', 
-                     '#Lags used', 
-                     'Number of observations'
-                     ])
-for key, value in dftest_initial[4].items():
-dfoutput_initial['Critical value ' + key] = value
-print(dfoutput_initial)
-print('\n')
-test_stationarity(df_demand)
-```
-The original timeseries is stationary.
-![figure 4.](assets/image/4.png)
+  Check if the data is suitable for an ARIMA model by determining whether it is stationary or not.
+  ```python
+  # import the ADF (Augmented Dickey-Fuller) test
+  # H0: The Time Series is non-stationary
+  # H1: The Time Series is stationary (which ARIMA models work best with)
+  # If p value < 0.05 then reject H0
+      
+  from statsmodels.tsa.stattools import adfuller
+  
+  # create a function that returns the necessary metrics to test stationarity
+  def test_stationarity(timeseries):
+  dftest_initial = adfuller(timeseries)
+  dfoutput_initial = pd.Series(dftest_initial[0:4], 
+  index=['Statistical Test', 
+                       'p-value', 
+                       '#Lags used', 
+                       'Number of observations'
+                       ])
+  for key, value in dftest_initial[4].items():
+  dfoutput_initial['Critical value ' + key] = value
+  print(dfoutput_initial)
+  print('\n')
+  test_stationarity(df_demand)
+  ```
+  The original timeseries is stationary.
+  ![figure 4.](assets/image/4.png)
 
 6. ARIMA model
    
