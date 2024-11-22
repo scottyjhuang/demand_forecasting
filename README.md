@@ -116,13 +116,14 @@ The original timeseries is stationary.
     plot_pacf(differenced_series,ax=axes[1])
     plt.show()
     ```
-    ![figure 4.](assets/image/4.png)
     p and q are in the blue area. Let's go back the testing and see if we can use differenced df_demand
+    ![figure 4.](assets/image/4.png)
+    
     ```python
     test_stationarity(df_demand.diff().dropna())
     ```
-    ![figure 5.](assets/image/5.png)
     The first-order differenced (lagged) demand is stationary as well
+    ![figure 5.](assets/image/5.png)
 
     ```python
     differenced_series = df_demand.diff().dropna()
@@ -133,5 +134,6 @@ The original timeseries is stationary.
     plt.show()
     
     ```
-    ![figure 6.](assets/image/6.png)
     Now we get **q = 1** (PACF plot), **d =1** (as we differenced the Time Series), and **q = 1** (ACF plot)
+    ![figure 6.](assets/image/6.png)
+
