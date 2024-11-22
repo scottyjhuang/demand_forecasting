@@ -23,6 +23,7 @@ There are 5 columns:
 - Product_ID (String)
 - Demand (Integer)
 - Inventory (Integer)
+
 in terms of forecasting demand we just need the date as index and the demand column.
 However for calculating optimized inventory (safety stock calculation etc.), we need to create some assumptions.
 
