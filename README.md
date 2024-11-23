@@ -5,7 +5,12 @@
 - [Objective](#Objective)
 - [Data Source](#Data-Source)
 - [Analysis](#Analysis)
-  - [Demand Forecasting](#Demand-Forecasting)
+  - [Data Exploring](#Data-Exploring)
+  - [Data Cleaning](#Data-Cleaning)
+  - [Data Visualisation](#Data-Visualisation)
+  - [Data Validation](#Data-Validation)
+  - [ARIMA Model](#ARIMA-Model)
+  - [SARIMA Model](#SARIMA-Model)
 - [Conclusion](#Conclusion)
 
 # Introduction
@@ -13,7 +18,7 @@ In a fast-paced retail environment, a sudden surge in demand can disrupt even th
 The unexpected demand put immense pressure on inventory levels, creating the risk of stockouts and unfulfilled orders that could tarnish the company's reputation. The challenge was clear: GreenMart needed an immediate, data-driven solution to **forecast demand, replenish inventory, and ensure seamless order fulfillment** during this critical period.
 
 # Objective
-This project delves into how advanced forecasting techniques, safety stock calculations, and inventory optimization strategies can transform chaotic scenarios into well-managed supply chain operations, even under extreme pressure.
+This project delves into how advanced forecasting techniques can fit the historical data and perform an accurate forecasting.
 
 # Data Source
 The data is from Statso [Here is the link]([https://github.com/your-repo-link](https://statso.io/inventory-optimization-case-study/))
@@ -28,12 +33,9 @@ in terms of forecasting demand we just need the date as index and the demand col
 However for calculating optimized inventory (safety stock calculation etc.), we need to create some assumptions.
 
 # Analysis
-I separate the analysis into 2 part: demand forecasting and inventory optimisation.
-
-## Demand Forecasting
 Let's start with importing some modules for visualisation and time series forecast
 
-1. Data Exploring
+## Data Exploring
    
    ```python
    import pandas as pd # Pandas is a Python library used for working with data sets. It has functions for analyzing, cleaning, exploring, and manipulating data.
@@ -104,9 +106,16 @@ Let's start with importing some modules for visualisation and time series foreca
   The original timeseries is stationary.
   ![figure 4.](assets/image/4.png)
 
-6. ARIMA model
+  ```python
+  # Validate the above hypothesis
+
+  from pmdarima.arima.utils import ndiffs
+  ndiffs(df.Demand,test="adf")
+  ```
+  
+## ARIMA Model
    
-- determine p & q value
+1. determine p & q value
     p = last lag where the PACF value is out of the significance band
     q = last lag where the ACF value is out of the significance band (displayed by the confidence interval)
     ```python
@@ -140,7 +149,7 @@ Let's start with importing some modules for visualisation and time series foreca
     Now we get **q = 1** (PACF plot), **d =1** (as we differenced the Time Series), and **q = 1** (ACF plot)
     ![figure 7.](assets/image/7.png)
 
-- training
+2. Create training and test data
 
   ```python
   testing_timeframe = 5
@@ -151,7 +160,7 @@ Let's start with importing some modules for visualisation and time series foreca
   ```
   ![figure 8.](assets/image/8.png)
 
-- ARIMA result
+3. ARIMA result
 
   ```python
   # import the required modules
@@ -161,7 +170,7 @@ Let's start with importing some modules for visualisation and time series foreca
   
   # create and fit the model
   model_fit = ARIMA(train1,  
-                    order = (2,1,1)
+                    order = (1,1,1)
                   ).fit()
   print(model_fit.summary())
   print('\n')
@@ -198,6 +207,10 @@ Let's start with importing some modules for visualisation and time series foreca
 
   ![figure 9.1](assets/image/9.1.png)
 
+  the p-value is greater than 0.05 for AR and MA. Therefore it's not a good forecasting tool for the dataset. Let's try SARIMA where we will add seasonaity.
+
+## Sarima Model
+
   ```python
   # import the required modules
   from statsmodels.tsa.arima.model import ARIMA
@@ -211,7 +224,7 @@ Let's start with importing some modules for visualisation and time series foreca
   # therfore P = 0 and Q = 2
   
   # create and fit the model
-  model_fit = SARIMAX(train1,order=(2,1,1),seasonal_order=(0,1,2,2)).fit()
+  model_fit = SARIMAX(train1,order=(1,1,1),seasonal_order=(1,1,2,7)).fit() # S=7 becasue we can see seasonaility every week
   print(model_fit.summary())
   print('\n')
   #####################################################################################
@@ -258,58 +271,6 @@ Let's start with importing some modules for visualisation and time series foreca
 
   ![figure 11.](assets/image/11.png)
 
-  ```python
-  # forecast for the next 10 days
-  order = (2, 1, 1)
-  seasonal_order = (0, 1, 1, 2) # the data contains a time period of 2 months only
-  model = SARIMAX(df_demand, order=order, seasonal_order=seasonal_order)
-  model_fit = model.fit(disp=False)
-  
-  future_steps = 10
-  predictions = model_fit.predict(len(df_demand), len(df_demand) + future_steps - 1)
-  predictions = predictions.astype(int)
-  print(predictions)
-  ```
-  
-  ![figure 12.](assets/image/12.png)
+  Only Ar.L1 is significant the rest are not, so we might instead using other forecasting tool e.g. Holt-Winters (ETS) model or Prophet.
 
-  ```python
-  import math
-
-  # Create date indices for the future predictions
-  future_dates = pd.date_range(start=df_demand.index[-1] + pd.DateOffset(days=1), periods=future_steps, freq='D')
   
-  # Create a pandas Series with the predicted values and date indices
-  forecasted_demand = pd.Series(predictions, index=future_dates)
-
-  # ParametersInitial
-  initial_inventory = 1000
-  lead_time = 100 # production + shipping from APAC to EMEA
-  service_level = 0.95
-  
-  # Calculate EOQ = [(2*S*D)/H]^(1/2)
-  EOQ = math.sqrt((2*stockout_cost*forecasted_demand.mean())/holding_cost)
-
-  # Calculate the optimal safety stock
-  safety_stock = z = np.abs(np.percentile(forecasted_demand, 100 * (1 - service_level)))
-  
-  # Calculate the reorder point
-  reorder_point = forecasted_demand.mean() * lead_time + EOQ
-  
-  # Calculate the total cost (holding cost + stockout cost)
-  holding_cost = USD 0.15
-  stockout_cost = USD 10 (missed sales)
-  total_holding_cost = holding_cost * (initial_inventory + 0.5 * order_quantity)
-  total_stockout_cost = stockout_cost * np.maximum(0, forecasted_demand.mean() * lead_time - initial_inventory)
-  
-  # Calculate the total cost
-  total_cost = total_holding_cost + total_stockout_cost
-  
-  print("Optimal Order Quantity:", order_quantity)
-  print("Reorder Point:", reorder_point)
-  print("Safety Stock:", safety_stock)
-  print("Total Cost:", total_cost)
-  print("EOQ:",EOQ)
-  ```
-
-  ![figure 13.](assets/image/13.png)
