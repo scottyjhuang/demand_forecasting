@@ -212,7 +212,7 @@ Let's start with importing some modules for visualisation and time series foreca
 
   the p-value is greater than 0.05 for AR and MA. Therefore it's not a good forecasting tool for the dataset. Let's try SARIMA where we will add seasonaity.
 
-## Sarima Model
+## SARIMA Model
 
   ```python
   # import the required modules
@@ -276,7 +276,7 @@ Let's start with importing some modules for visualisation and time series foreca
 
   Only Ar.L1 is significant the rest are not, so we might instead using other forecasting tool e.g. Holt-Winters (ETS) model or Prophet.
 
-## Holt-Winters (ETS) model 
+## Holt-Winters (ETS) Model 
 
   ```python
   
