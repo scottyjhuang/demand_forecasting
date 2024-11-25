@@ -385,12 +385,9 @@ Let's start with importing some modules for visualisation and time series foreca
   # Conclusion
   In this study, we explored three forecasting models—ARIMA, SARIMA, and Holt-Winters Exponential Smoothing (ETS)—to train and test demand data with a clear seasonal component and no significant trend.
   
-  1. ARIMA and SARIMA Models:
-     Despite the data being stationary, which is a prerequisite for ARIMA and SARIMA models, the resulting models produced high p-values for key parameters. This indicated that these models did not capture the underlying patterns in the data effectively, leading to suboptimal forecasts.
+  **1. ARIMA and SARIMA Models:** Despite the data being stationary, which is a prerequisite for ARIMA and SARIMA models, the resulting models produced high p-values for key parameters. This indicated that these models did not capture the underlying patterns in the data effectively, leading to suboptimal forecasts.
 
-  2. Holt-Winters Model:
-     The Holt-Winters model was applied to account for the level and seasonal components of the data. The model revealed that the trend coefficient was effectively zero, confirming the absence of a significant trend in the dataset. By excluding the trend component and focusing solely on level and seasonality, the Holt-Winters model produced the most accurate forecasts, as evidenced by the lowest AIC and BIC values compared to ARIMA and SARIMA.
+  **2. Holt-Winters Model:** The Holt-Winters model was applied to account for the level and seasonal components of the data. The model revealed that the trend coefficient was effectively zero, confirming the absence of a significant trend in the dataset. By excluding the trend component and focusing solely on level and seasonality, the Holt-Winters model produced the most accurate forecasts, as evidenced by the lowest AIC and BIC values compared to ARIMA and SARIMA.
      
-  3. Key Findings:
-     The Holt-Winters model outperformed ARIMA and SARIMA due to its ability to directly model the data's characteristics—constant seasonal variations and no trend. This approach provided a more interpretable and robust solution for forecasting demand.
-  4. Conclusion: The Holt-Winters model, configured with multiplicative seasonality and no trend, was identified as the best-fit model for this dataset. It effectively captured the underlying patterns, delivering accurate forecasts and outperforming ARIMA-based methods.
+  **3. Key Findings:** The Holt-Winters model outperformed ARIMA and SARIMA due to its ability to directly model the data's characteristics—constant seasonal variations and no trend. This approach provided a more interpretable and robust solution for forecasting demand.
+ ** 4. Conclusion:** The Holt-Winters model, configured with multiplicative seasonality and no trend, was identified as the best-fit model for this dataset. It effectively captured the underlying patterns, delivering accurate forecasts and outperforming ARIMA-based methods.
