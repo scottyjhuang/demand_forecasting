@@ -11,6 +11,7 @@
   - [Data Validation](#Data-Validation)
   - [ARIMA Model](#ARIMA-Model)
   - [SARIMA Model](#SARIMA-Model)
+  - [Holt-Winters (ETS) model](#Holt-Winters-(ETS)-model)
 - [Conclusion](#Conclusion)
 
 # Introduction
@@ -275,4 +276,121 @@ Let's start with importing some modules for visualisation and time series foreca
 
   Only Ar.L1 is significant the rest are not, so we might instead using other forecasting tool e.g. Holt-Winters (ETS) model or Prophet.
 
+## Holt-Winters (ETS) model 
+
+  ```python
   
+  # Import packages
+  import plotly.graph_objects as go
+  import pandas as pd
+  from statsmodels.tsa.holtwinters import SimpleExpSmoothing, Holt, ExponentialSmoothing
+  
+  # Read in the data
+  data = pd.read_csv('demand_inventory.csv')
+  data['Date'] = pd.to_datetime(data['Date'])
+  data = data[['Date','Demand']]
+  
+  # Split train and test
+  train = data.iloc[:-int(len(data) * 0.2)]
+  test = data.iloc[-int(len(data) * 0.2):]
+  
+  
+  def plot_func(forecast1: list[float],
+                forecast2: list[float],
+                forecast3: list[float],
+                title: str) -> None:
+      """Function to plot the forecasts."""
+      fig = go.Figure()
+      fig.add_trace(go.Scatter(x=train['Date'], y=train['Demand'], name='Train'))
+      fig.add_trace(go.Scatter(x=test['Date'], y=test['Demand'], name='Train'))
+      fig.add_trace(go.Scatter(x=test['Date'], y=forecast1, name='Simple'))
+      fig.add_trace(go.Scatter(x=test['Date'], y=forecast2, name="Holt's Linear"))
+      fig.add_trace(go.Scatter(x=test['Date'], y=forecast3, name='Holt Winters'))
+      fig.update_layout(template="simple_white", font=dict(size=18), title_text=title,
+                        width=700, title_x=0.5, height=400, xaxis_title='Date',
+                        yaxis_title='Demand')
+      return fig.show()
+  
+  
+  # Fit simple model and get forecasts
+  model_simple = SimpleExpSmoothing(train['Demand']).fit(optimized=True)
+  forecasts_simple = model_simple.forecast(len(test))
+  
+  # Fit Holt's model and get forecasts
+  model_holt = Holt(train['Demand'], damped_trend=True).fit(optimized=True)
+  forecasts_holt = model_holt.forecast(len(test))
+  
+  # Fit Holt Winters model and get forecasts
+  model_holt_winters = ExponentialSmoothing(train['Demand'], trend='mul',
+                                            seasonal='mul', seasonal_periods=7)\
+                                            .fit(optimized=True)
+  forecasts_holt_winters = model_holt_winters.forecast(len(test))
+  
+  # Plot the forecasts
+  plot_func(forecasts_simple, forecasts_holt, forecasts_holt_winters,  "Holt-Winters Exponential Smoothing")
+  ```
+  ![figure 12.](assets/image/12.png)
+
+  Holt-Winters Exponential Smoothing has the best result over simple and double smoothing
+
+  Let's evaluate the reqult
+
+  ```python
+  RMSE = np.sqrt(mean_squared_error(test['Demand'], forecasts_holt_winters))
+  print(model_holt_winters.summary())
+  print("RMSE:", RMSE)
+  ```
+  ![figure 13.](assets/image/13.png)
+
+  The result shows no trend for the data because beta (trend coef) is 0 and it's more accurate compared to ARIMA and SARIMA with lower AIC and BIC.
+
+  Next, we remove the trend and change the seasonal as additive from the Holt-Winters Model.
+
+  ```python
+  # Fit Holt Winters model and get forecasts, using trend as None and seaonal as additive (No multiplicative growth or decay)
+  model_holt_winters = ExponentialSmoothing(train['Demand'], trend=None,
+                                            seasonal='mul', seasonal_periods=7)\
+                                            .fit(optimized=True)
+  forecasts_holt_winters = model_holt_winters.forecast(len(test))
+  # Plot the forecasts
+  plot_func(forecasts_simple, forecasts_holt, forecasts_holt_winters,  "Holt-Winters Exponential Smoothing")
+  ```
+  
+  ![figure 14.](assets/image/14.png)
+
+  The forecast looks more accurate. To validate, we run the summary and RMSE again.
+
+  ```python
+  print(model_holt_winters.summary())
+  RMSE = np.sqrt(mean_squared_error(test['Demand'], forecasts_holt_winters))
+  print("RMSE:", RMSE)
+  ```
+  ![figure 15.](assets/image/15.png)
+
+  Now we fit the model and forecast for the next 10 days.
+  
+  ```python
+  # forecast for the next 10 days
+  model = ExponentialSmoothing(train['Demand'], trend='mul',
+                                            seasonal='mul', seasonal_periods=7)\
+                                            .fit(optimized=True)
+  
+  future_steps = 7
+  predictions = model.predict(len(df_demand), len(df_demand) + future_steps - 1)
+  predictions = predictions.astype(int)
+  print(predictions)
+  ```
+  ![figure 14.](assets/image/16.png)
+
+  # Conclusion
+  In this study, we explored three forecasting models—ARIMA, SARIMA, and Holt-Winters Exponential Smoothing (ETS)—to train and test demand data with a clear seasonal component and no significant trend.
+  
+  1. ARIMA and SARIMA Models:
+     Despite the data being stationary, which is a prerequisite for ARIMA and SARIMA models, the resulting models produced high p-values for key parameters. This indicated that these models did not capture the underlying patterns in the data effectively, leading to suboptimal forecasts.
+
+  2. Holt-Winters Model:
+     The Holt-Winters model was applied to account for the level and seasonal components of the data. The model revealed that the trend coefficient was effectively zero, confirming the absence of a significant trend in the dataset. By excluding the trend component and focusing solely on level and seasonality, the Holt-Winters model produced the most accurate forecasts, as evidenced by the lowest AIC and BIC values compared to ARIMA and SARIMA.
+     
+  3. Key Findings:
+     The Holt-Winters model outperformed ARIMA and SARIMA due to its ability to directly model the data's characteristics—constant seasonal variations and no trend. This approach provided a more interpretable and robust solution for forecasting demand.
+  4. Conclusion: The Holt-Winters model, configured with multiplicative seasonality and no trend, was identified as the best-fit model for this dataset. It effectively captured the underlying patterns, delivering accurate forecasts and outperforming ARIMA-based methods.
