@@ -17,6 +17,8 @@
 In a fast-paced retail environment, a sudden surge in demand can disrupt even the most carefully planned supply chains. GreenMart Supplies faced such a challenge when a newly launched marketing campaign for their best-selling product, Product P1, went viral overnight. Promising "next-day delivery, always in stock," the campaign drew unprecedented attention, causing sales to spike by 200% within 24 hours.
 The unexpected demand put immense pressure on inventory levels, creating the risk of stockouts and unfulfilled orders that could tarnish the company's reputation. The challenge was clear: GreenMart needed an immediate, data-driven solution to **forecast demand, replenish inventory, and ensure seamless order fulfillment** during this critical period.
 
+As a Demand Forecaster for GreenMart Supplies,I need to create an accurate and agile forecast specifically tailored to the unprecedented demand surge caused by the viral campaign, so that I can provide actionable insights to the supply chain team for timely inventory replenishment.
+
 # Objective
 This project delves into how advanced forecasting techniques can fit the historical data and perform an accurate forecasting.
 
